@@ -1,0 +1,19 @@
+model:
+  n_cells: 6
+  hl: 1
+---
+data:
+  path: '../Datasets'
+  hop: 512
+  nfft: 1024
+  max_nframes:
+  win_size: 100
+  tar_size: 25
+  batch_size: 64
+  ds_size:
+  frac: 0.8
+---
+train:
+  optimizer: 'adam'
+  lr: 0.001
+  epochs: 50
