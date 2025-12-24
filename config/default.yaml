@@ -1,4 +1,5 @@
 model:
+  name: '6cells_1hidden'
   n_cells: 6
   hl: 1
 ---

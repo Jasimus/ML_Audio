@@ -15,7 +15,7 @@ class AudioData():
         self.batch_size = hp.data.batch_size
         self.frac = hp.data.frac
 
-        wav_files = os.path.join(hp.data.src, '*,wav')
+        wav_files = os.path.join(hp.data.src, '*.wav')
         self.paths = glob.glob(wav_files, recursive=True)
 
         if hp.max_nframes:

@@ -1,5 +1,8 @@
 from tensorflow import keras
 from keras.optimizers import Adam
+from numpy import inf
+import os
+
 
 def build_model(input_steps, output_steps, n_features, n_cells=4, lr=0.01, hidden_layers=1, hidden_activation="relu"):
     optimizer = Adam(learning_rate=lr)
@@ -19,3 +22,15 @@ def build_model(input_steps, output_steps, n_features, n_cells=4, lr=0.01, hidde
                  metrics=['mse'])
 
     return model
+
+
+def take_model(path, model_name):
+    ckp = None
+    ckp_list = os.listdir(path)
+
+    for c in ckp_list:
+        if c == f'{model_name}.keras':
+            ckp = c
+    
+    return ckp
+
