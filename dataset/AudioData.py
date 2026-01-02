@@ -14,11 +14,13 @@ class AudioData():
         self.tar_size = hp.data.tar_size
         self.batch_size = hp.data.batch_size
         self.frac = hp.data.frac
+        self.ds_size = None
 
         wav_files = os.path.join(hp.data.src, '*.wav')
+        print("ruta de wavs",wav_files)
         self.paths = glob.glob(wav_files, recursive=True)
 
-        if hp.max_nframes:
+        if hp.data.max_nframes:
             self.max_nframes = hp.data.max_nframes
 
         else:

@@ -1,16 +1,19 @@
+#!/usr/bin/env python3
+
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
-from .model.models import build_model, take_model
+from model.models import build_model, take_model
 from utils.hparams import HParam
 from dataset.AudioData import AudioData
 import os
 
 CKP_DIR = "checkpoints"
-CONFIG = "dafault.yaml"
+CONFIG = "default.yaml"
 
 ## loading hyperparameters
-hp = HParam(f"config/{CONFIG}")
+config_path = os.path.join("config", CONFIG)
+hp = HParam(config_path)
 
 ## loading data
 audio_data = AudioData(hp)
@@ -37,13 +40,14 @@ es_cb = EarlyStopping(monitor='loss', patience=3)
 
 checkpoint_cb = ModelCheckpoint(
     filepath=f"{CKP_DIR}/{hp.model.name}.keras",
-    monitor="val_loss",
+    monitor="loss",
     save_best_only=True,
     save_weights_only=False,
     verbose=1
 )
 
+print(train_ds.cardinality().numpy())
+
 best_model.fit(train_ds,
                callbacks=[es_cb, checkpoint_cb],
-               epochs=hp.train.epochs,
-               validation_split=0.2)
+               epochs=hp.train.epochs)

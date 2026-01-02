@@ -4,7 +4,7 @@ model:
   hl: 1
 ---
 data:
-  path: '../Datasets'
+  src: '../data'
   hop: 512
   nfft: 1024
   max_nframes:
