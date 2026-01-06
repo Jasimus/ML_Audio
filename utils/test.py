@@ -1,18 +1,19 @@
 import numpy as np
 import tensorflow as tf
+from dataset.AudioData import AudioData
 
 
-def generate_blocks(model, n_steps, input_window, output_window, initial_context):
-  OW = output_window            # por ej. 25 frames
-  overlap = OW // 2             # 12
-  hop = OW - overlap            # 13
+def generate_blocks(model, hp, initial_context):
+  OW = hp.data.tar_size
+  input_window = hp.data.win_size
+  n_steps = hp.test.n_blocks
 
-  ev = OW%2
+  overlap = OW // 2
 
   # Ventana Hann para OLA
-  hann = np.hanning(OW)         # (OW,)
-  w_up = hann[:overlap]         # mitad ascendente
-  w_down = hann[overlap:]       # mitad descendente
+  hann = np.hanning(OW)
+  w_up = hann[:overlap]
+  w_down = hann[overlap:]
 
   # Inicialización del buffer final
   final_spec = None
@@ -20,7 +21,7 @@ def generate_blocks(model, n_steps, input_window, output_window, initial_context
   # Tu contexto inicial (X0)
   context = tf.expand_dims(initial_context, axis=0)     # shape = (1, input_window, n_frec*2)
 
-  for step in range(n_steps):   # generar n bloques
+  for _ in range(n_steps):   # generar n bloques
 
       block = model.predict(context)    # (1, OW, n_frec*2)
       if final_spec is None:
@@ -65,4 +66,8 @@ def data_to_spec(pred):
 
     return tf.complex(p_r, p_i)
 
+
+def stft_to_signal(stft, nfft, hop):
+        signal = tf.signal.inverse_stft(stft, frame_length=nfft, frame_step=hop)
+        return signal
 

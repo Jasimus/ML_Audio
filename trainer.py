@@ -8,12 +8,13 @@ from utils.hparams import HParam
 from dataset.AudioData import AudioData
 import os
 
-CKP_DIR = "checkpoints"
 CONFIG = "default.yaml"
 
 ## loading hyperparameters
 config_path = os.path.join("config", CONFIG)
 hp = HParam(config_path)
+
+CKP_DIR = hp.train.checkpoints
 
 ## loading data
 audio_data = AudioData(hp)

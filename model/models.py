@@ -31,6 +31,7 @@ def take_model(path, model_name):
     for c in ckp_list:
         if c == f'{model_name}.keras':
             ckp = c
+            break
     
     return ckp
 

@@ -18,3 +18,8 @@ train:
   optimizer: 'adam'
   lr: 0.001
   epochs: 50
+  checkpoints: 'checkpoints'
+---
+test:
+  n_blocks: 20
+  sample_src: 'test/sample1.wav'

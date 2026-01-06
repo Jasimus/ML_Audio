@@ -89,11 +89,6 @@ class AudioData():
         return spec
 
 
-    def stft_to_signal(self, stft):
-        signal = tf.signal.inverse_stft(stft, frame_length=self.nfft, frame_step=self.hop)
-        return signal
-
-
     def load_and_process(self, path, shift=1):
 
         signal, = tf.py_function(func=self.load_audio, inp=[path], Tout=[tf.float32])
