@@ -24,7 +24,7 @@ class AudioData():
             self.max_nframes = hp.data.max_nframes
 
         else:
-            self.max_nframes = self.count_frames()        
+            self.max_nframes = self.count_frames()
             ## falta escribir max_nframes en el yaml
 
         self.t_frames = self.max_nframes // self.hop
@@ -106,86 +106,61 @@ class AudioData():
         return tf.data.Dataset.from_tensor_slices(self.create_sequences(padded_spec, shift))
 
 
-    def load_audio_to_test(self, path):
-        audio, sr = sf.read(path)
-        signal = audio.astype(np.float32)
-        audio_shape = signal.shape
 
-        if len(audio_shape) > 1:
-            signal = np.mean(signal, axis=1)
-
-        max_val = np.max(signal)
-        return signal/max_val
-
-
-    def load_and_process_to_test(self, path, shift=1):
-        signal = self.load_audio_to_test(path)
-        stft_spec = self.signal_to_stft(signal)
-        current_frames = tf.shape(stft_spec)[0]
-        padding_a = tf.maximum(0, self.t_frames - current_frames)
-
-        padded_spec = tf.pad(
-            stft_spec,
-            paddings=[[0, padding_a], [0, 0]],
-            mode='CONSTANT'
-        )
-
-        return self.create_sequences(padded_spec, shift)
-
-
-    def create_sequences(self, spec, shift=1):
-
-        spec_re = tf.math.real(spec)
-        spec_im = tf.math.imag(spec)
-
-        X_win_re = tf.signal.frame(
-            spec_re,
-            frame_length=self.win_size,
-            frame_step=shift,
-            pad_end=False,
-            axis=0
-        )
-
-        X_win_im = tf.signal.frame(
-            spec_im,
-            frame_length=self.win_size,
-            frame_step=shift,
-            pad_end=False,
-            axis=0
-        )
-
-        y_spec_re = spec_re[self.win_size:]
-        y_spec_im = spec_im[self.win_size:]
-
-        y_win_re = tf.signal.frame(
-            y_spec_re,
-            frame_length=self.tar_size,
-            frame_step=shift,
-            pad_end=False,
-            axis=0
-        )
-
-        y_win_im = tf.signal.frame(
-            y_spec_im,
-            frame_length=self.tar_size,
-            frame_step=shift,
-            pad_end=False,
-            axis=0
-        )
-
-        X_win = tf.concat([X_win_re, X_win_im], axis=-1)
-        y_win = tf.concat([y_win_re, y_win_im], axis=-1)
-
-        min_seq = tf.minimum(tf.shape(X_win)[0],tf.shape(y_win)[0])
-
-        X_seq = X_win[:min_seq]
-        y_seq = y_win[:min_seq]
-
-        return (X_seq, y_seq)
-    
 
     def count_dataset(self, ds):
         count = 0
         for _ in ds:
             count += 1
         return count
+    
+
+def create_sequences(win_size, tar_size, spec, shift=1):
+
+    spec_re = tf.math.real(spec)
+    spec_im = tf.math.imag(spec)
+
+    X_win_re = tf.signal.frame(
+        spec_re,
+        frame_length=win_size,
+        frame_step=shift,
+        pad_end=False,
+        axis=0
+    )
+
+    X_win_im = tf.signal.frame(
+        spec_im,
+        frame_length=win_size,
+        frame_step=shift,
+        pad_end=False,
+        axis=0
+    )
+
+    y_spec_re = spec_re[win_size:]
+    y_spec_im = spec_im[win_size:]
+
+    y_win_re = tf.signal.frame(
+        y_spec_re,
+        frame_length=tar_size,
+        frame_step=shift,
+        pad_end=False,
+        axis=0
+    )
+
+    y_win_im = tf.signal.frame(
+        y_spec_im,
+        frame_length=tar_size,
+        frame_step=shift,
+        pad_end=False,
+        axis=0
+    )
+
+    X_win = tf.concat([X_win_re, X_win_im], axis=-1)
+    y_win = tf.concat([y_win_re, y_win_im], axis=-1)
+
+    min_seq = tf.minimum(tf.shape(X_win)[0],tf.shape(y_win)[0])
+
+    X_seq = X_win[:min_seq]
+    y_seq = y_win[:min_seq]
+
+    return (X_seq, y_seq)

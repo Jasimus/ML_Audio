@@ -1,13 +1,16 @@
 import numpy as np
 import tensorflow as tf
-from dataset.AudioData import AudioData
+from dataset.AudioData import create_sequences
+import soundfile as sf
 
+def generate_blocks(model, hp):
+  sample_test, sr = load_and_process_to_test(hp.test.sample_src)
 
-def generate_blocks(model, hp, initial_context):
   OW = hp.data.tar_size
   input_window = hp.data.win_size
   n_steps = hp.test.n_blocks
 
+  initial_context = sample_test[-input_window:]
   overlap = OW // 2
 
   # Ventana Hann para OLA
@@ -67,7 +70,31 @@ def data_to_spec(pred):
     return tf.complex(p_r, p_i)
 
 
-def stft_to_signal(stft, nfft, hop):
-        signal = tf.signal.inverse_stft(stft, frame_length=nfft, frame_step=hop)
-        return signal
+def stft_to_signal(stft, hp):
+    signal = tf.signal.inverse_stft(stft, frame_length=hp.data.nfft, frame_step=hp.data.hop)
+    return signal
 
+
+def signal_to_stft(self, signal):
+        spec = tf.signal.stft(signal, frame_length=self.nfft, frame_step=self.hop)
+        return spec
+
+
+def load_audio_to_test(path):
+    audio, sr = sf.read(path)
+    signal = audio.astype(np.float32)
+    audio_shape = signal.shape
+
+    if len(audio_shape) > 1:
+        signal = np.mean(signal, axis=1)
+
+    max_val = np.max(signal)
+    return signal/max_val, sr
+
+
+def load_and_process_to_test(path, shift=1):
+    
+    signal, sr = load_audio_to_test(path)
+    stft_spec = signal_to_stft(signal)
+
+    return create_sequences(stft_spec, shift), sr
