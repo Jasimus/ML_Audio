@@ -58,7 +58,7 @@ def generate_blocks(model, hp):
           context = np.vstack([np.zeros((pad, final_spec.shape[1])), final_spec])
           context = tf.expand_dims(context, axis=0)
 
-  return final_spec
+  return final_spec, sr
 
 
 def data_to_spec(pred):

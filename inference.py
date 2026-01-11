@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from utils.test import data_to_spec, generate_blocks, stft_to_signal
 from tensorflow.keras.models import load_model
 from utils.hparams import HParam
