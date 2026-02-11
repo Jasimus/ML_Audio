@@ -18,7 +18,7 @@ CKP_DIR = hp.train.checkpoints
 
 ## loading data
 audio_data = AudioData(hp)
-train_ds, _ = audio_data.create_train_test()
+train_ds, test_ds = audio_data.create_train_test()
 
 os.makedirs(CKP_DIR, exist_ok=True)
 
@@ -52,3 +52,9 @@ print(train_ds.cardinality().numpy())
 best_model.fit(train_ds,
                callbacks=[es_cb, checkpoint_cb],
                epochs=hp.train.epochs)
+
+
+if hp.data.frac != 1:
+    loss, acc = best_model.evaluate(test_ds, steps=50)
+    print("final loss: %.3f" % loss)
+    print("final accurate: %.3f" % acc)

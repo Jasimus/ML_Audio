@@ -17,7 +17,6 @@ class AudioData():
         self.ds_size = None
 
         wav_files = os.path.join(hp.data.src, '*.wav')
-        print("ruta de wavs",wav_files)
         self.paths = glob.glob(wav_files, recursive=True)
 
         if hp.data.max_nframes:
@@ -38,7 +37,7 @@ class AudioData():
     def create_train_test(self):
         ds = self.create_dataset()
         if not self.ds_size:
-            self.ds_size = self.count_dataset(ds)
+            self.ds_size = len(self.paths)
             warnings.warn("warning: you must to set hp.data.ds_size value")
 
         tr_size = math.floor(self.frac * self.ds_size)
@@ -103,17 +102,8 @@ class AudioData():
             mode='CONSTANT'
         )
 
-        return tf.data.Dataset.from_tensor_slices(self.create_sequences(padded_spec, shift))
+        return tf.data.Dataset.from_tensor_slices(create_sequences(self.win_size, self.tar_size, padded_spec, shift))
 
-
-
-
-    def count_dataset(self, ds):
-        count = 0
-        for _ in ds:
-            count += 1
-        return count
-    
 
 def create_sequences(win_size, tar_size, spec, shift=1):
 

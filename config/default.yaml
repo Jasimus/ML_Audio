@@ -4,7 +4,7 @@ model:
   hl: 1
 ---
 data:
-  src: '../data'
+  src: '../subdata'
   hop: 512
   nfft: 1024
   max_nframes:
@@ -12,7 +12,7 @@ data:
   tar_size: 25
   batch_size: 64
   ds_size:
-  frac: 0.8
+  frac: 0.5
 ---
 train:
   optimizer: 'adam'
